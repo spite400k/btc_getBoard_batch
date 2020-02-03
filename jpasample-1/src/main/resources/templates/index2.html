@@ -3,8 +3,33 @@
     <head>
         <title>Springboot</title>
         <meta charset="utf-8" />
+	<!-- Load plotly.js into the DOM -->
+	<script src='https://cdn.plot.ly/plotly-latest.min.js'></script>
+	<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+	
+	<script>
+	
+	$(document).ready( function(){
+		var data = [];
+		
+		for (var j = 0; j < 10; j ++) {
+		    var y0 = [];
+		    for (var i = 0; i < 50; i ++) {
+			    y0[i] = Math.random()+i;
+		    };
+		    data[j]={
+		      y: y0,
+		      type: 'box'
+		    };
+		  };
+	
+		Plotly.newPlot('myDiv', data);
+		});
+	</script>
+
     </head>
     <body>
+		<div id='myDiv'><!-- Plotly chart will be drawn inside this DIV --></div>
         <h1 th:text="${title}"></h1>
         <table>
             <tr th:each="emp : ${emplist}" th:object="${emp}">
