@@ -1,0 +1,35 @@
+plugins {
+	id 'org.springframework.boot' version '2.2.2.RELEASE'
+	id 'io.spring.dependency-management' version '1.0.8.RELEASE'
+	id 'java'
+	id 'war'
+}
+
+group = 'com.btc'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '1.8'
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+    compile('org.springframework.boot:spring-boot-starter-data-jpa')
+    compile('org.springframework.boot:spring-boot-starter-thymeleaf')
+    compile('org.springframework.boot:spring-boot-starter-web')
+    runtime('org.springframework.boot:spring-boot-devtools')
+    runtime('mysql:mysql-connector-java')
+    compileOnly('org.projectlombok:lombok')
+    providedRuntime('org.springframework.boot:spring-boot-starter-tomcat')
+    testCompile('org.springframework.boot:spring-boot-starter-test')
+}
+
+test {
+	useJUnitPlatform()
+}
