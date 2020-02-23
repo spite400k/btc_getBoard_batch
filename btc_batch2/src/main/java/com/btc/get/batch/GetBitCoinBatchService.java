@@ -90,8 +90,8 @@ public class GetBitCoinBatchService implements CommandLineRunner {
 //				continuos = false;
 //			}
 			Thread.sleep(SLEEP_TIME);
-			
-			SLEEP_TIME= 10*1000;
+
+			SLEEP_TIME = 10 * 1000;
 		}
 	}
 
@@ -123,7 +123,9 @@ public class GetBitCoinBatchService implements CommandLineRunner {
 		RateObject mapper = JSON.decode(jsonData, RateObject.class);
 
 		// BIDとASKのLISTを取得
+		// 売り
 		List<Bid> bids = mapper.getBids();
+		// 買い
 		List<Ask> asks = mapper.getAsks();
 
 		// BIDデータを抽出
@@ -154,28 +156,13 @@ public class GetBitCoinBatchService implements CommandLineRunner {
 
 		Long count = 0L;
 
-		logger.info("ask");
-		for (Ask ask : asks) {
-			count += 1;
-			TrnRateAskEntity ae = new TrnRateAskEntity();
-			TrnRatePK pk = new TrnRatePK();
-			pk.setAutoId(autoId);
-			pk.setAutoIdDetail(count);
+		// 売り 高い値段のものを残す
+		bids.stream().sorted((p1, p2) -> {
+//			int ret = p1.getPrice().compareTo(p2.getPrice());
+//			return ret == 0 ? p1.getPrice().compareTo(p2.getPrice()) : ret;
 
-			ae.setTrnRatePK(pk);
-			ae.setPrice(ask.getPrice());
-			ae.setSize(ask.getSize());
-
-			ae.setCreate_timestamp(ts);
-			askList.add(ae);
-
-//			logger.info(count.toString());
-
-		}
-		rateAskRepository.saveAll(askList);
-//		logger.info(String.valueOf(askList.size()));
-
-		count = 0L;
+			return p2.getPrice().compareTo(p1.getPrice());
+		});
 
 		logger.info("bid");
 		for (Bid bid : bids) {
@@ -191,9 +178,48 @@ public class GetBitCoinBatchService implements CommandLineRunner {
 
 			be.setCreate_timestamp(ts);
 			bidList.add(be);
+
+			if (count >= 6) {
+				break;
+			}
 		}
 		rateBidRepository.saveAll(bidList);
 		// logger.info(String.valueOf(bidList.size()));
+
+		count = 0L;
+
+		// 買い
+		asks.stream().sorted((p1, p2) -> {
+//			int ret = p1.getPrice().compareTo(p2.getPrice());
+//			return ret == 0 ? p1.getPrice().compareTo(p2.getPrice()) : ret;
+
+			return p1.getPrice().compareTo(p2.getPrice());
+		});
+
+		logger.info("ask");
+		for (Ask ask : asks) {
+			count += 1;
+			TrnRateAskEntity ae = new TrnRateAskEntity();
+			TrnRatePK pk = new TrnRatePK();
+			pk.setAutoId(autoId);
+			pk.setAutoIdDetail(count);
+
+			ae.setTrnRatePK(pk);
+			ae.setPrice(ask.getPrice());
+			ae.setSize(ask.getSize());
+
+			ae.setCreate_timestamp(ts);
+			askList.add(ae);
+
+			if (count >= 6) {
+				break;
+			}
+//			logger.info(count.toString());
+
+		}
+
+		rateAskRepository.saveAll(askList);
+//		logger.info(String.valueOf(askList.size()));
 
 	}
 
